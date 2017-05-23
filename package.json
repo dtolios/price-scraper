@@ -1,0 +1,24 @@
+{
+  "name": "price-scraper",
+  "version": "1.0.0",
+  "description": "A simple Node.js command line application that goes to an ecommerce site to get the latest prices and save them to a spreadsheet.",
+  "main": "scraper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dtolios/price-scraper.git"
+  },
+  "keywords": [
+    "treehouse",
+    "scraper",
+    "cli"
+  ],
+  "author": "Dimitri Tolios",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dtolios/price-scraper/issues"
+  },
+  "homepage": "https://github.com/dtolios/price-scraper#readme"
+}
