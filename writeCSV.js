@@ -13,13 +13,13 @@ const csv = require('csv');
 function saveData(dirPath, data) {
     try {
         fs.mkdirSync(dirPath);
-        makeCSV(data);
+        makeCSV(dirPath, data);
     }
     catch(error) {
         if(error.code !== 'EEXIST') {
             throw error;
         }
-        makeCSV(data);
+        makeCSV(dirPath, data);
     }
 
 }
