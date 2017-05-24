@@ -4,6 +4,9 @@ const fs = require('fs');
 /** @requires csv */
 const csv = require('csv');
 
+/** @requires errorLogger.js */
+const errorLogger = require('./errorLogger.js');
+
 /**
  * @funciton saveData
  * @param dirPath - the directory path you would like to create, and store your data in
@@ -13,14 +16,13 @@ const csv = require('csv');
 function saveData(dirPath, data) {
     try {
         fs.mkdirSync(dirPath);
-        makeCSV(dirPath, data);
     }
     catch(error) {
         if(error.code !== 'EEXIST') {
-            throw error;
+            errorLogger.logError(error);
         }
-        makeCSV(dirPath, data);
     }
+    makeCSV(dirPath, data);
 
 }
 
@@ -39,10 +41,10 @@ function makeCSV(dirPath, data) {
             url: 'URL',
             time: 'Time'
         },
-        header: 4
+        header: 5
     };
     csv.stringify(data, options, (error, output) => {
-        if(error) throw error;
+        if(error) errorLogger.logError(error);
         writeFile(dirPath, output);
     })
 }
@@ -55,7 +57,7 @@ function makeCSV(dirPath, data) {
  */
 function writeFile(dirPath, data) {
     const date = new Date();
-    const fileName = `${dirPath}/${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}.csv`
+    const fileName = `${dirPath}/${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}.csv`;
     fs.writeFile(fileName, data, (err) => {
         if (err) throw err;
         console.log('The file has been saved!');

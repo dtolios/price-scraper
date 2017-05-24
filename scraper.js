@@ -6,6 +6,8 @@ const cheerio = require('cheerio');
 
 /** @requires writeCSV */
 const writeCSV = require('./writeCSV.js');
+/** @requires errorLogger.js */
+const errorLogger = require('./errorLogger.js');
 
 /**
  * @global
@@ -74,17 +76,17 @@ function getProducts() {
             }
             else {
                 // Status code error
-                console.error(`There has been a ${response.statusCode} error. Error: ${http.STATUS_CODES[response.statusCode]}`);
+                errorLogger.logError(`There has been a ${response.statusCode} error. Error: ${http.STATUS_CODES[response.statusCode]}`);
             }
         });
         request.on('error', (e) => {
-            console.error(`Cannot connect to ${options.hostname}.\n Error message: ${e.message}`);
+            errorLogger.logError(`Cannot connect to ${options.hostname}. Error message: ${e.message}`);
         });
         request.end();
     }
     catch(error) {
         // Malformed URL Error
-        console.error("There was a URL error");
+        errorLogger.logError("There was a URL error");
     }
 }
 
@@ -124,16 +126,16 @@ function getProduct(productPath, numProducts) {
             }
             else {
                 // Status code error
-                console.error(`There has been a ${response.statusCode} error. Error: ${http.STATUS_CODES[response.statusCode]}`);
+                errorLogger.logError(`There has been a ${response.statusCode} error. Error: ${http.STATUS_CODES[response.statusCode]}`);
             }
         });
         request.on('error', (e) => {
-            console.error(`Cannot connect to ${options.hostname}.\n Error message: ${e.message}`);
+            errorLogger.logError(`Cannot connect to ${options.hostname}.\n Error message: ${e.message}`);
         });
         request.end();
     }
     catch(error) {
-        console.error("There was a URL error");
+        errorLogger.logError("There was a URL error");
     }
 }
 

@@ -4,6 +4,7 @@
   "description": "A simple Node.js command line application that goes to an ecommerce site to get the latest prices and save them to a spreadsheet.",
   "main": "scraper.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,6 +25,7 @@
   "dependencies": {
     "cheerio": "^0.22.0",
     "csv": "^1.1.1",
-    "jsdoc": "^3.4.3"
+    "jsdoc": "^3.4.3",
+    "winston": "^2.3.1"
   }
 }
