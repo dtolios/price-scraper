@@ -1,9 +1,16 @@
-
-// Require the desired libraries
+/** @requires http */
 const http = require('http');
 
+/** @requires cheerio */
 const cheerio = require('cheerio');
 
+/** @requires writeCSV */
+const writeCSV = require('./writeCSV.js');
+
+/**
+ * @global
+ * HTTP request options for the shirts website
+ */
 const options = {
     hostname: 'www.shirts4mike.com',
     port: 80,
@@ -13,15 +20,35 @@ const options = {
         'Content-Type': 'text/html'
     }
 };
+
+/**
+ * @global
+ * array of product objects
+ */
 const products = [];
 
-function Product(title, price, url, imgURL) {
+/**
+ * Represents a product.
+ * @class
+ * @param {string} title - The title of the product
+ * @param {float} price - The price of the product
+ * @param {string} imgURL - The url of the product's image
+ * @param {string} url - The url of the product
+ * @param {string} time - The time the product was scraped, formatted in HH:MM:SS:MS
+ */
+function Product(title, price, imgURL, url, time) {
     this.title = title;
     this.price = price;
-    this.url = url;
     this.imgURL = imgURL;
+    this.url = url;
+    this.time = time;
 }
 
+/**
+ * @function getProducts
+ * Makes an http request using the global options object and scrapes the /shirts.php entry point for paths to the
+ * product detail pages. Then calls getProduct() for each product path
+ */
 function getProducts() {
     try {
         const request = http.request(options, (response) => {
@@ -34,12 +61,12 @@ function getProducts() {
 
                 response.on('end', () => {
                     const $ = cheerio.load(html);
-                    const products = [];
+                    const $productList = $('.products li');
+                    const numProducts = $productList.length;
 
-
-                    $('.products li').each((i, elem) => {
+                    $productList.each((i, elem) => {
                         const productPath = $(elem).children('a').attr('href');
-                        products.push(getProduct(productPath));
+                        getProduct(productPath, numProducts);
                     });
 
 
@@ -47,20 +74,28 @@ function getProducts() {
             }
             else {
                 // Status code error
+                console.error(`There has been a ${response.statusCode} error. Error: ${http.STATUS_CODES[response.statusCode]}`);
             }
         });
         request.on('error', (e) => {
-            console.error(`problem with request: ${e.message}`);
+            console.error(`Cannot connect to ${options.hostname}.\n Error message: ${e.message}`);
         });
         request.end();
     }
     catch(error) {
         // Malformed URL Error
-        console.error("there was a URL error");
+        console.error("There was a URL error");
     }
 }
 
-function getProduct(productPath) {
+/**
+ * @function getProducts
+ * Makes an http request and changes the options.path member to the value of argument 'productPath'
+ * productPath represents the path to the product detail page.
+ * @param {string} productPath - the path to the product detail page
+ * @param {int} numProducts - the number of products on the shirts.php page (aka the number of list items in ul.products)
+ */
+function getProduct(productPath, numProducts) {
     try {
         options.path = `/${productPath}`;
 
@@ -74,26 +109,33 @@ function getProduct(productPath) {
 
                 response.on('end', () => {
                     const $ = cheerio.load(html);
-                    const title = $('.shirt-picture > span > img').attr('alt');
+                    const $productIMG = $('.shirt-picture > span > img');
+                    const title = $productIMG.attr('alt');
                     const price = $('.price').text();
+                    const imgURL = `http://${options.hostname}/${$productIMG.attr('src')}`;
                     const url = `http://${options.hostname}/${productPath}`;
-                    const imgURL = `http://${options.hostname}/${$('.shirt-picture > span > img').attr('src')}`;
-                    return new Product(title, price, url, imgURL);
+                    const date = new Date();
+                    const isoTimeString = date.toISOString();
+                    products.push(new Product(title, price, imgURL, url, isoTimeString));
+                    if(products.length === numProducts) {
+                        writeCSV.saveData('./data', products);
+                    }
                 });
             }
             else {
                 // Status code error
-                console.log(response.statusCode);
+                console.error(`There has been a ${response.statusCode} error. Error: ${http.STATUS_CODES[response.statusCode]}`);
             }
         });
         request.on('error', (e) => {
-            console.error(`problem with request: ${e.message}`);
+            console.error(`Cannot connect to ${options.hostname}.\n Error message: ${e.message}`);
         });
         request.end();
     }
     catch(error) {
-        console.error("there was a URL error");
+        console.error("There was a URL error");
     }
 }
 
-getProducts();
+
+module.exports.scrapeProducts = getProducts;
