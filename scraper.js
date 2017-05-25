@@ -6,7 +6,7 @@ const cheerio = require('cheerio');
 
 /** @requires writeCSV */
 const writeCSV = require('./writeCSV.js');
-/** @requires errorLogger.js */
+/** @requires errorLogger */
 const errorLogger = require('./errorLogger.js');
 
 /**

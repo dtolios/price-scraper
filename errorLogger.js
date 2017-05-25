@@ -4,6 +4,7 @@ const fs = require('fs');
 /** @requires winston */
 const winston = require('winston');
 
+/** configuration for winston's default logger. will log to specified file */
 winston.configure({
     transports: [
         new (winston.transports.File)({
@@ -14,6 +15,12 @@ winston.configure({
     ]
 });
 
+/**
+ * @function logError
+ * @param {object} error - the object/string to log
+ * takes an error object or string as a parameter and passes it to winston.error for logging
+ * tries to create logs directory if one does not exist.
+ */
 function logError(error) {
     try {
         fs.mkdirSync('./logs');
